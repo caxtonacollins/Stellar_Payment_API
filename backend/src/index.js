@@ -4,14 +4,24 @@ import morgan from "morgan";
 import cors from "cors";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import paymentsRouter from "./routes/payments.js";
+import createPaymentsRouter from "./routes/payments.js";
 import merchantsRouter from "./routes/merchants.js";
 import { requireApiKeyAuth } from "./lib/auth.js";
 import { supabase } from "./lib/supabase.js";
 import { pool, closePool } from "./lib/db.js";
 import { validateEnvironmentVariables } from "./lib/env-validation.js";
+import { closeRedisClient, connectRedisClient } from "./lib/redis.js";
+import {
+  createRedisRateLimitStore,
+  createVerifyPaymentRateLimit,
+} from "./lib/rate-limit.js";
 
 validateEnvironmentVariables();
+
+const redisClient = await connectRedisClient();
+const verifyPaymentRateLimit = createVerifyPaymentRateLimit({
+  store: createRedisRateLimitStore({ client: redisClient }),
+});
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -77,7 +87,7 @@ app.get("/health", async (req, res) => {
 
 app.use("/api/create-payment", requireApiKeyAuth());
 app.use("/api/rotate-key", requireApiKeyAuth());
-app.use("/api", paymentsRouter);
+app.use("/api", createPaymentsRouter({ verifyPaymentRateLimit }));
 app.use("/api", merchantsRouter);
 
 app.use((err, req, res, next) => {
@@ -103,6 +113,7 @@ function shutdown(signal) {
   console.log(`${signal} received — closing server and pg pool...`);
   server.close(async () => {
     await closePool();
+    await closeRedisClient();
     console.log('pg pool closed. Goodbye.');
     process.exit(0);
   });
