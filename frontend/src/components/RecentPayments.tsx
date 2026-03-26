@@ -151,14 +151,6 @@ export default function RecentPayments() {
     filters.dateFrom ||
     filters.dateTo;
 
-  const activeFilterCount = [
-    filters.search,
-    filters.status !== "all",
-    filters.asset !== "all",
-    filters.dateFrom,
-    filters.dateTo,
-  ].filter(Boolean).length;
-
   const handlePaymentClick = (paymentId: string) => {
     setSelectedPayment(paymentId);
     setIsModalOpen(true);
