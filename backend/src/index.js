@@ -14,9 +14,6 @@ import { supabase } from "./lib/supabase.js";
 import { pool, closePool } from "./lib/db.js";
 import { validateEnvironmentVariables } from "./lib/env-validation.js";
 import { idempotencyMiddleware } from "./lib/idempotency.js";
-import { supabase } from "./lib/supabase.js";
-import merchantsRouter from "./routes/merchants.js";
-import paymentsRouter from "./routes/payments.js";
 
 validateEnvironmentVariables();
 

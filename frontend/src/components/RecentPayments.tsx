@@ -26,9 +26,9 @@ export default function RecentPayments() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+  const [page] = useState(1);
+  const [, setTotalPages] = useState(1);
+  const [, setTotalCount] = useState(0);
   const [hydrated, setHydrated] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -247,7 +247,6 @@ export default function RecentPayments() {
   return (
     <div className="flex flex-col gap-4">
       {/* Table */}
-    <>
       <div className="overflow-x-auto rounded-xl border border-white/10">
         <table className="w-full text-left text-sm">
           <thead>
@@ -318,6 +317,6 @@ export default function RecentPayments() {
         isOpen={isModalOpen}
         onClose={closeModal}
       />
-    </>
-  );
+    </div>
+    );
 }
