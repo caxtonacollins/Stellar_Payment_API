@@ -3,6 +3,7 @@
 import Sidebar from "@/components/Sidebar";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
+import PaymentToastListener from "@/components/PaymentToastListener";
 import { motion } from "framer-motion";
 
 export default function AuthenticatedLayout({
@@ -14,6 +15,7 @@ export default function AuthenticatedLayout({
     <div className="flex min-h-screen bg-black">
       {/* Sidebar - fixed width for desktop layout offset */}
       <Sidebar />
+      <PaymentToastListener />
 
       {/* Main Content Area */}
       <main className="flex-1 transition-all lg:pl-[260px]">
