@@ -11,6 +11,7 @@ import createMerchantsRouter from "./routes/merchants.js";
 import metricsRouter from "./routes/metrics.js";
 import webhooksRouter from "./routes/webhooks.js";
 import prometheusRouter from "./routes/prometheus.js";
+import paymentDetailsRouter from "./routes/paymentDetails.js"; // NEW
 
 import { requireApiKeyAuth } from "./lib/auth.js";
 import { isHorizonReachable } from "./lib/stellar.js";
@@ -71,7 +72,7 @@ export async function createApp({ redisClient }) {
         callback(new Error("Not allowed by CORS"));
       },
       credentials: true,
-    }),
+    })
   );
 
   app.use(express.json({ limit: "1mb" }));
@@ -126,15 +127,16 @@ export async function createApp({ redisClient }) {
   app.use("/api/create-payment", idempotencyMiddleware);
   app.use("/api/sessions", requireApiKeyAuth());
   app.use("/api/sessions", idempotencyMiddleware);
-  app.use("/api/payments", requireApiKeyAuth());
+  app.use("/api/payments", requireApiKeyAuth()); // covers /api/payments/:id too
   app.use("/api/rotate-key", requireApiKeyAuth());
   app.use("/api/merchant-branding", requireApiKeyAuth());
   app.use("/api/webhooks", requireApiKeyAuth());
 
   app.use("/api", createPaymentsRouter({ verifyPaymentRateLimit }));
-  app.use("/api", createMerchantsRouter({ merchantRegistrationRateLimit }));
+  app.use("/api", merchantsRouter({ merchantRegistrationRateLimit }));
   app.use("/api", metricsRouter);
   app.use("/api", webhooksRouter);
+  app.use("/api/payments", paymentDetailsRouter); // NEW — GET /api/payments/:id
 
   // Prometheus Metrics endpoint
   app.use("/", prometheusRouter);
