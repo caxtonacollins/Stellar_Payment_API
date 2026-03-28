@@ -17,6 +17,9 @@ import { sendWebhook } from "../lib/webhooks.js";
 import { sendReceiptEmail } from "../lib/email.js";
 import { renderReceiptEmail } from "../lib/email-templates.js";
 import { resolveBrandingConfig } from "../lib/branding.js";
+
+import { sendReceiptEmail } from "../lib/email.js";
+
 import {
   connectRedisClient,
   getCachedPayment,
@@ -39,6 +42,7 @@ import {
   getNetworkFeeStats,
 } from "../lib/stellar.js";
 
+
 const createPaymentRateLimit = createCreatePaymentRateLimit();
 
 const defaultVerifyPaymentRateLimit = rateLimit({
@@ -48,6 +52,8 @@ const defaultVerifyPaymentRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+
 
 function applyPaymentFilters(query, req) {
   const { status, asset, date_from: dateFrom, date_to: dateTo, search } = req.query || {};
@@ -75,6 +81,7 @@ function applyPaymentFilters(query, req) {
   }
   return query;
 }
+
 
 function createPaymentsRouter({
   verifyPaymentRateLimit = defaultVerifyPaymentRateLimit,
@@ -413,6 +420,10 @@ function createPaymentsRouter({
         let query = supabase
           .from("payments")
           .select(
+
+            "id, amount, asset, asset_issuer, recipient, status, tx_id, memo, memo_type, webhook_url, merchants(webhook_secret, notification_email, business_name)",
+          )
+
             "id, merchant_id, amount, asset, asset_issuer, recipient, status, tx_id, memo, memo_type, webhook_url, merchants(webhook_secret, webhook_version, webhook_custom_headers, notification_email, email)"
           );
 
@@ -421,6 +432,7 @@ function createPaymentsRouter({
         }
 
         const { data, error } = await query
+
           .eq("id", req.params.id)
           .is("deleted_at", null)
           .maybeSingle();
@@ -523,6 +535,15 @@ function createPaymentsRouter({
           data.id,
           data.merchants?.webhook_custom_headers ?? {}
         );
+        sendReceiptEmail({
+          to: data.merchants?.notification_email,
+          businessName: data.merchants?.business_name || "Merchant",
+          amount: data.amount,
+          asset: data.asset,
+          recipient: data.recipient,
+          txId: match.transaction_hash,
+          paymentId: data.id,
+        });
 
         if (!webhookResult.ok && !webhookResult.skipped) {
           console.warn("Webhook failed", webhookResult);
