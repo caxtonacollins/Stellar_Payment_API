@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import CopyButton from "./CopyButton";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import Link from "next/link";
 import {
   useHydrateMerchantStore,

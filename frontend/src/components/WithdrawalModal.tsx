@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAnchorServices, authenticateWithAnchor, initiateWithdrawal } from "@/lib/stellar";
 import { signWithFreighter, getFreighterPublicKey } from "@/lib/freighter";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 interface WithdrawalModalProps {
   isOpen: boolean;

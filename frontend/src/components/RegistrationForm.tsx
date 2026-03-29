@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { registerMerchant, type Merchant } from "../lib/auth";
 import CopyButton from "./CopyButton";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {
   useSetMerchantApiKey,
   useSetMerchantMetadata,
