@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Remove default browser focus outlines */
+*:focus {
+  outline: none;
+}
+
+/* Global focus-visible styling for keyboard navigation */
+*:focus-visible {
+  @apply ring-2 ring-mint ring-offset-2 ring-offset-night;
+}
+
 html {
   scroll-behavior: smooth;
 }
