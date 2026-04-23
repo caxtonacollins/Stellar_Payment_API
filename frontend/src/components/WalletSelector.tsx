@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useWallet } from "@/lib/wallet-context";
 import { connectWalletConnect } from "@/lib/wallet-walletconnect";
@@ -44,10 +44,9 @@ export default function WalletSelector({
     };
   }, [providers]);
 
-  // If the active provider is already selected, nothing to show
-  if (activeProvider) return null;
 
-  async function handleSelect(id: string) {
+
+  const handleSelect = useCallback(async (id: string) => {
     if (id === "walletconnect") {
       setWcError(null);
       setWcPairing(true);
@@ -68,7 +67,43 @@ export default function WalletSelector({
 
     selectProvider(id);
     onConnected();
-  }
+  }, [networkPassphrase, onConnected, selectProvider, t]);
+
+  const providerButtons = useMemo(() => {
+    return providers.map((p) => {
+      const available = providerAvailability[p.id] ?? false;
+      const isWc = p.id === "walletconnect";
+
+      return (
+        <button
+          key={p.id}
+          type="button"
+          disabled={!available || wcPairing}
+          onClick={() => handleSelect(p.id)}
+          className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 font-semibold text-white transition-all hover:border-mint/50 hover:bg-mint/10 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {isWc && wcPairing ? (
+            <span className="flex items-center gap-2 text-sm">
+              <Spinner size="sm" />
+              {t("walletConnectWaiting")}
+            </span>
+          ) : (
+            <>
+              {p.name}
+              {!available && (
+                <span className="text-xs text-slate-500">
+                  {isWc ? t("noProjectId") : t("notInstalled")}
+                </span>
+              )}
+            </>
+          )}
+        </button>
+      );
+    });
+  }, [providers, providerAvailability, wcPairing, handleSelect, t]);
+
+  // If the active provider is already selected, nothing to show
+  if (activeProvider) return null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -77,36 +112,7 @@ export default function WalletSelector({
       </p>
 
       <div className="flex flex-col gap-2">
-        {providers.map((p) => {
-          const available = providerAvailability[p.id] ?? false;
-          const isWc = p.id === "walletconnect";
-
-          return (
-            <button
-              key={p.id}
-              type="button"
-              disabled={!available || wcPairing}
-              onClick={() => handleSelect(p.id)}
-              className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 font-semibold text-white transition-all hover:border-mint/50 hover:bg-mint/10 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {isWc && wcPairing ? (
-                <span className="flex items-center gap-2 text-sm">
-                  <Spinner size="sm" />
-                  {t("walletConnectWaiting")}
-                </span>
-              ) : (
-                <>
-                  {p.name}
-                  {!available && (
-                    <span className="text-xs text-slate-500">
-                      {isWc ? t("noProjectId") : t("notInstalled")}
-                    </span>
-                  )}
-                </>
-              )}
-            </button>
-          );
-        })}
+        {providerButtons}
       </div>
 
       {/* WalletConnect QR code */}

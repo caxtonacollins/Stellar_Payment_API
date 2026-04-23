@@ -807,8 +807,70 @@ export default function PaymentHistoryPage() {
         </p>
       </div>
 
-      {/* Payment Table */}
-      <div className="overflow-x-auto rounded-xl border border-white/10">
+      {/* Payment List (Mobile Card View) */}
+      <div className="flex flex-col gap-4 sm:hidden">
+        {payments.map((payment) => (
+          <div
+            key={payment.id}
+            onClick={() => handlePaymentClick(payment.id)}
+            className={`cursor-pointer rounded-2xl border border-white/10 bg-white/5 p-4 transition-all active:scale-[0.98] ${flashedIds.has(payment.id)
+              ? "animate-payment-confirmed bg-green-500/10"
+              : ""
+              }`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span
+                className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${payment.status === "confirmed"
+                  ? "bg-green-500/20 text-green-400"
+                  : payment.status === "failed"
+                    ? "bg-red-500/20 text-red-400"
+                    : payment.status === "refunded"
+                      ? "bg-blue-500/20 text-blue-400"
+                      : "bg-yellow-500/20 text-yellow-400"
+                  }`}
+              >
+                {toStatusLabel(t, payment.status)}
+              </span>
+              <p className="text-xs text-slate-500">
+                {new Date(payment.created_at).toLocaleDateString(locale, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+            <div className="flex items-end justify-between">
+              <div className="min-w-0">
+                <p className="text-lg font-bold text-white truncate">
+                  {payment.amount} {payment.asset}
+                </p>
+                <p className="mt-1 text-xs text-slate-400 truncate">
+                  {payment.description || "No description"}
+                </p>
+              </div>
+              <div className="shrink-0 text-mint">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Payment Table (Desktop View) */}
+      <div className="hidden sm:block overflow-x-auto rounded-xl border border-white/10">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-white/10 bg-white/5">

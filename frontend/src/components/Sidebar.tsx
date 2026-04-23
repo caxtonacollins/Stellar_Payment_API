@@ -106,30 +106,34 @@ function NavLinks({
   const navItems = getNavItems(t);
 
   return (
-    <nav className="flex flex-1 flex-col gap-2 px-3 py-6">
+    <nav className="flex flex-1 flex-col gap-2 px-3 py-6" role="navigation">
+      <ul className="flex flex-col gap-2">
       {navItems.map((item) => {
         const isActive =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
 
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
+          <li key={item.href}>
+            <Link
+              href={item.href}
+              onClick={onNavigate}
+              aria-current={isActive ? "page" : undefined}
             className={`flex items-center gap-4 rounded-2xl px-4 py-3 transition-all ${
-              isActive
-                ? "bg-mint text-black font-semibold shadow-[0_0_20px_rgba(45,212,191,0.2)]"
-                : "text-slate-300 hover:bg-white/5 hover:text-white"
-            }`}
-          >
+                isActive
+                  ? "bg-mint text-black font-semibold shadow-[0_0_20px_rgba(45,212,191,0.2)]"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white focus:bg-white/5 focus:outline-none focus:ring-1 focus:ring-mint/30"
+              }`}
+            >
             <span className={isActive ? "text-black" : "text-slate-400"}>
               {item.icon}
             </span>
             {!isCollapsed && <span className="text-sm">{item.label}</span>}
-          </Link>
+            </Link>
+          </li>
         );
       })}
-    </nav>
+    </ul>
+  </nav>
   );
 }
 

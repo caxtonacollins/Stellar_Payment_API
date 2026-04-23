@@ -50,12 +50,12 @@ export default function RegistrationForm() {
   if (registeredMerchant) {
     return (
       <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="rounded-2xl border border-mint/30 bg-mint/5 p-6 backdrop-blur">
+        <div className="group rounded-2xl border border-mint/30 bg-mint/5 p-6 backdrop-blur transition-all hover:border-mint/50 hover:shadow-[0_0_30px_rgba(45,212,191,0.1)]">
           <div className="flex flex-col gap-2">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-mint">
               Registration Success
             </p>
-            <h2 className="text-xl font-semibold text-white">
+            <h2 className="text-xl font-semibold text-white group-hover:text-glow transition-colors">
               Welcome, {registeredMerchant.business_name}!
             </h2>
             <p className="text-sm text-slate-400">
